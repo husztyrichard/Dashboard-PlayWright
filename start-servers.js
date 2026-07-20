@@ -14,7 +14,7 @@ function start(cmd, name) {
 
 start('node backend/server.js', 'backend');
 // start frontend after short delay to give backend time to initialize
-setTimeout(() => start('npx live-server frontend --port=5500 --quiet', 'frontend'), 2000);
+setTimeout(() => start('npx live-server . --port=5500 --quiet', 'frontend'), 2000);
 
 process.on('SIGINT', () => {
   procs.forEach(p => p.kill());
