@@ -8,6 +8,28 @@ const closeStatusModal = document.getElementById("closeStatusModal");
 
 let selectedBugId = null;
 
+function getApiBaseUrl() {
+    const configuredBase = window.__API_BASE_URL__;
+
+    if (configuredBase) {
+        return configuredBase.replace(/\/$/, '');
+    }
+
+    const hostname = window.location.hostname;
+
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]') {
+        return 'http://localhost:3000';
+    }
+
+    return '';
+}
+
+function getApiUrl(path) {
+    const baseUrl = getApiBaseUrl();
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+
+    return `${baseUrl}${normalizedPath}`;
+}
 
 createBtn.addEventListener("click", () => {
 
@@ -26,7 +48,7 @@ closeBtn.addEventListener("click", () => {
 // Load bugs from backend
 async function loadBugs() {
 
-    const response = await fetch("http://localhost:3000/api/bugs");
+    const response = await fetch(getApiUrl('/api/bugs'));
 
     const bugs = await response.json();
 
@@ -85,7 +107,7 @@ saveBtn.addEventListener("click", async () => {
 
     try {
 
-        const response = await fetch("http://localhost:3000/api/bugs", {
+        const response = await fetch(getApiUrl('/api/bugs'), {
 
             method: "POST",
 
@@ -152,7 +174,7 @@ async function deleteBug(id) {
 
 
     const response = await fetch(
-        `http://localhost:3000/api/bugs/${id}`,
+        getApiUrl(`/api/bugs/${id}`),
         {
             method: "DELETE"
         }
@@ -206,7 +228,7 @@ async function selectStatus(status) {
 console.log("Sending PUT request...");
 
     const response = await fetch(
-        `http://localhost:3000/api/bugs/${selectedBugId}`,
+        getApiUrl(`/api/bugs/${selectedBugId}`),
         {
             method: "PUT",
 
@@ -239,7 +261,7 @@ async function loadDashboardStats() {
     try {
 
         const bugsResponse = await fetch(
-            "http://localhost:3000/api/bugs"
+            getApiUrl('/api/bugs')
         );
 
         const bugs = await bugsResponse.json();
@@ -258,7 +280,7 @@ async function loadDashboardStats() {
 
 
         const statusResponse = await fetch(
-            "http://localhost:3000/api/status"
+            getApiUrl('/api/status')
         );
 
         const status = await statusResponse.json();
