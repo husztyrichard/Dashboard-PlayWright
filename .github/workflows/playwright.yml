@@ -31,14 +31,32 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      - name: Run Jest backend tests
+      - name: Run Jest backend tests with coverage
         working-directory: backend
-        run: npm test
+        run: npm run test:coverage
 
       - name: Run Playwright tests
         run: npm run test:playwright
         env:
           CI: true
+
+      - name: Upload backend coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage/
+          retention-days: 30
+
+      - name: Upload test reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            playwright-report/
+            backend/coverage/
+          retention-days: 30
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
