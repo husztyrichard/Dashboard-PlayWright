@@ -30,6 +30,10 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
+      - name: Run Jest backend tests
+        working-directory: backend
+        run: npm test
+
       - name: Run Playwright tests
         run: npm run test:playwright
         env:
