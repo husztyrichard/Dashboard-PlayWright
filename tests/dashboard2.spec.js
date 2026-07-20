@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures/testFixtures.js';
+import { AxeBuilder } from '@axe-core/playwright';
 
 test.describe('QA Dashboard', () => {
 
@@ -8,6 +9,14 @@ test.describe('QA Dashboard', () => {
 
   test('should display bug table', async ({ dashboard }) => {
     await expect(dashboard.bugTable).toBeVisible();
+  });
+
+  test('should have no critical accessibility violations', async ({ dashboard }) => {
+    const accessibilityScanResults = await new AxeBuilder({ page: dashboard.page })
+      .withTags(['wcag2a', 'wcag2aa'])
+      .analyze();
+
+    expect(accessibilityScanResults.violations).toEqual([]);
   });
 
   test('should open create bug modal', async ({ dashboard }) => {
