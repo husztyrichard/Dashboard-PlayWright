@@ -21,7 +21,7 @@ function getApiBaseUrl() {
         return 'http://localhost:3000';
     }
 
-    return '';
+    return 'https://dashboard-playwright.onrender.com';
 }
 
 function getApiUrl(path) {
