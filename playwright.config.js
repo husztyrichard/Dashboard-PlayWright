@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: './tests',
 
   use: {
-    headless: false,
+    headless: process.env.CI ? true : false,
     trace: 'on-first-retry',
   screenshot: 'only-on-failure',
     /* Set base URL used by tests (server serves the `frontend` folder at root) */
