@@ -1,69 +1,45 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures/testFixtures.js';
 
 test.describe('QA Dashboard', () => {
 
-  test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      window.confirm = () => true;
-    });
-
-    page._alerts = [];
-    page.on('dialog', dialog => {
-      if (dialog.type() === 'alert') {
-        page._alerts.push(dialog.message());
-        dialog.accept();
-      } else {
-        dialog.accept();
-      }
-    });
-    await page.goto('/frontend/index.html', { waitUntil: 'networkidle' });
-    // wait for the main header to ensure frontend rendered and scripts ran
-    await page.waitForSelector('text=QA Dashboard', { timeout: 10000 });
+  test('should load the dashboard page', async ({ dashboard }) => {
+    await expect(dashboard.header).toBeVisible();
   });
 
-  test('should load the dashboard page', async ({ page }) => {
-    await expect(page.locator('text=QA Dashboard')).toBeVisible();
+  test('should display bug table', async ({ dashboard }) => {
+    await expect(dashboard.bugTable).toBeVisible();
   });
 
-  test('should display bug table', async ({ page }) => {
-    await expect(page.locator('[data-cy="bug-table"]')).toBeVisible();
+  test('should open create bug modal', async ({ dashboard }) => {
+    await dashboard.openCreate();
+    await expect(dashboard.titleInput).toBeVisible();
   });
 
-  test('should open create bug modal', async ({ page }) => {
-    await page.locator('[data-cy="create-bug-button"]').click();
-    await expect(page.locator('[data-cy="bug-title-input"]')).toBeVisible();
+  test('should create a new bug', async ({ dashboard }) => {
+    await dashboard.createBug('API login failure');
+    await expect(dashboard.bugTable).toContainText('API login failure');
+    await expect(dashboard.bugTable).toContainText('LOW');
   });
 
-  test('should create a new bug', async ({ page }) => {
-    await page.locator('[data-cy="create-bug-button"]').click();
-    await page.locator('[data-cy="bug-title-input"]').fill('API login failure');
-    await page.selectOption('#priority', 'LOW');
-    await page.locator('[data-cy="save-bug-button"]').click();
-    await expect(page.locator('[data-cy="bug-table"]')).toContainText('API login failure');
-    await expect(page.locator('[data-cy="bug-table"]')).toContainText('LOW');
-  });
-
-  test('should not create bug without title', async ({ page, request }) => {
+  test('should not create bug without title', async ({ dashboard, request }) => {
     const beforeResponse = await request.get('http://localhost:3000/api/bugs');
     const bugCountBefore = (await beforeResponse.json()).length;
 
-    await page.locator('[data-cy="create-bug-button"]').click();
-    await page.locator('[data-cy="save-bug-button"]').click();
+    await dashboard.openCreate();
+    await dashboard.save();
 
-    expect(page._alerts).toContain('Bug title is required');
+    const alerts = await dashboard.getAlerts();
+    expect(alerts).toContain('Bug title is required');
 
     const afterResponse = await request.get('http://localhost:3000/api/bugs');
     const bugCountAfter = (await afterResponse.json()).length;
     expect(bugCountAfter).toBe(bugCountBefore);
   });
 
-  test('should create bug with selected priority', async ({ page }) => {
-    await page.locator('[data-cy="create-bug-button"]').click();
-    await page.locator('[data-cy="bug-title-input"]').fill('Payment error');
-    await page.selectOption('#priority', 'HIGH');
-    await page.locator('[data-cy="save-bug-button"]').click();
-    await expect(page.locator('[data-cy="bug-table"]')).toContainText('Payment error');
-    await expect(page.locator('[data-cy="bug-table"]')).toContainText('HIGH');
+  test('should create bug with selected priority', async ({ dashboard }) => {
+    await dashboard.createBug('Payment error', 'HIGH');
+    await expect(dashboard.bugTable).toContainText('Payment error');
+    await expect(dashboard.bugTable).toContainText('HIGH');
   });
 
   test('should get bugs from API', async ({ request }) => {
@@ -127,15 +103,14 @@ test.describe('QA Dashboard', () => {
     expect(deletedBug).toBeUndefined();
   });
 
-  test('should change bug status from UI', async ({ page }) => {
-    await page.locator('[data-cy="bug-status"]').first().click();
-    await page.locator('[data-cy="status-closed"]').click();
-    await expect(page.locator('[data-cy="bug-table"]')).toContainText('CLOSED');
+  test('should change bug status from UI', async ({ dashboard }) => {
+    await dashboard.changeStatusFromUI();
+    await expect(dashboard.bugTable).toContainText('CLOSED');
   });
 
-  test('should display API status as OK', async ({ page }) => {
-    await expect(page.locator('#systemStatus')).toBeVisible();
-    await expect(page.locator('#systemStatus')).toContainText('OK');
+  test('should display API status as OK', async ({ dashboard }) => {
+    await expect(dashboard.systemStatus).toBeVisible();
+    await expect(dashboard.systemStatus).toContainText('OK');
   });
 
 });
