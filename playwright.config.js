@@ -29,6 +29,6 @@ export default defineConfig({
   webServer: {
     command: 'node ./start-servers.js',
     url: 'http://127.0.0.1:5500',
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
   },
 });
