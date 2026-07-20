@@ -4,6 +4,7 @@
   "description": "A full-stack QA practice project created to demonstrate API testing, test automation and basic frontend/backend development.",
   "main": "index.js",
   "scripts": {
+    "start:backend": "node backend/server.js",
     "test:playwright": "playwright test",
     "test:a11y": "playwright test --grep accessibility"
   },
@@ -20,5 +21,9 @@
     "@types/node": "^26.1.1",
     "axe-core": "^4.12.1",
     "live-server": "^1.2.2"
+  },
+  "dependencies": {
+    "swagger-ui-express": "^5.0.1",
+    "yamljs": "^0.3.0"
   }
 }

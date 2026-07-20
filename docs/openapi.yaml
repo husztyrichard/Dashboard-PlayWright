@@ -1,0 +1,193 @@
+openapi: 3.0.3
+info:
+  title: Bug Tracker API
+  version: 1.0.0
+  description: >-
+    REST API for managing dashboard bugs used by the Playwright and Jest test suites.
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+paths:
+  /api/bugs:
+    get:
+      summary: List all bugs
+      operationId: listBugs
+      responses:
+        '200':
+          description: A list of bugs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Bug'
+    post:
+      summary: Create a new bug
+      operationId: createBug
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBugRequest'
+      responses:
+        '201':
+          description: Bug created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bug'
+        '400':
+          description: Validation failed or duplicate title
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/bugs/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Bug identifier
+    get:
+      summary: Get a single bug by ID
+      operationId: getBug
+      responses:
+        '200':
+          description: Bug found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bug'
+        '404':
+          description: Bug not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update a bug
+      operationId: updateBug
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBugRequest'
+      responses:
+        '200':
+          description: Bug updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bug'
+        '404':
+          description: Bug not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete a bug
+      operationId: deleteBug
+      responses:
+        '200':
+          description: Bug deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bug'
+        '404':
+          description: Bug not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/status:
+    get:
+      summary: Get API health status
+      operationId: getStatus
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+components:
+  schemas:
+    Bug:
+      type: object
+      required:
+        - id
+        - title
+        - priority
+        - status
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Login error
+        priority:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+          example: HIGH
+        status:
+          type: string
+          enum: [OPEN, TESTING, CLOSED]
+          example: OPEN
+    CreateBugRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          example: API login failure
+        priority:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+          example: HIGH
+    UpdateBugRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Login bug fixed
+        priority:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+          example: LOW
+        status:
+          type: string
+          enum: [OPEN, TESTING, CLOSED]
+          example: CLOSED
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Bug not found
+    StatusResponse:
+      type: object
+      required:
+        - status
+        - service
+        - timestamp
+      properties:
+        status:
+          type: string
+          example: OK
+        service:
+          type: string
+          example: Bug Tracker API
+        timestamp:
+          type: string
+          format: date-time
+          example: 2026-07-20T12:00:00.000Z

@@ -1,5 +1,8 @@
 const express = require("express");
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const path = require('path');
 
 const app = express();
 
@@ -8,6 +11,15 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+const swaggerDocument = YAML.load(
+  path.join(__dirname, '../docs/openapi.yaml')
+);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+app.get('/swagger-test', (req, res) => {
+  res.send('Swagger route exists');
+});
 
 let bugs = [
     {
