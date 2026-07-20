@@ -1,0 +1,29 @@
+{
+  "name": "prodzs",
+  "version": "1.0.0",
+  "description": "A full-stack QA practice project created to demonstrate API testing, test automation and basic frontend/backend development.",
+  "main": "index.js",
+  "scripts": {
+    "test:chrome": "cypress run --spec cypress/e2e/dashboard2.cy.js --browser chrome",
+    "test:playwright": "playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decoNTANK/Dashboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/decoNTANK/Dashboard/issues"
+  },
+  "homepage": "https://github.com/decoNTANK/Dashboard#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.1",
+    "cypress": "^15.18.1",
+    "mochawesome": "^7.1.4",
+    "mochawesome-merge": "^5.1.1",
+    "mochawesome-report-generator": "^6.3.2"
+  }
+}

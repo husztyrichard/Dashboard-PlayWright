@@ -1,0 +1,546 @@
+{
+  "info": {
+    "_postman_id": "bd1724cd-f13b-403f-b6b0-f07b640bba1a",
+    "name": "Dashboard API Test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "56573287",
+    "_collection_link": "https://go.postman.co/collection/56573287-bd1724cd-f13b-403f-b6b0-f07b640bba1a?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Get all bugs",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", () => {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Response is an array\", () => {\r",
+              "\r",
+              "    const response = pm.response.json();\r",
+              "\r",
+              "    pm.expect(response).to.be.an(\"array\");\r",
+              "\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Bug has required fields\", () => {\r",
+              "\r",
+              "    const bug = pm.response.json()[0];\r",
+              "\r",
+              "    pm.expect(bug).to.have.property(\"id\");\r",
+              "    pm.expect(bug).to.have.property(\"title\");\r",
+              "    pm.expect(bug).to.have.property(\"priority\");\r",
+              "    pm.expect(bug).to.have.property(\"status\");\r",
+              "\r",
+              "    const bugs = pm.response.json();\r",
+              "\r",
+              "pm.collectionVariables.set(\"existingBugId\", bugs[0].id);\r",
+              "\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/bugs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "bugs"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get existing bug",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "const response = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Correct bug returned\", function () {\r",
+              "    pm.expect(response.id).to.eql(\r",
+              "        Number(pm.collectionVariables.get(\"existingBugId\"))\r",
+              "    );\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/bugs/{{existingBugId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "bugs",
+            "{{existingBugId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get non existing bug",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404\", () => {\r",
+              "    pm.response.to.have.status(404);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Correct error message is returned\", () => {\r",
+              "    const body = pm.response.json();\r",
+              "    pm.expect(body.message).to.eql(\"Bug not found\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/bugs/999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "bugs",
+            "999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create bug",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", () => {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Created bug has correct title\", () => {\r",
+              "\r",
+              "    const bug = pm.response.json();\r",
+              "\r",
+              "    pm.expect(bug.title)\r",
+              "        .to.eql(\"API login failure\");\r",
+              "\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Created bug has OPEN status\", () => {\r",
+              "\r",
+              "    const bug = pm.response.json();\r",
+              "\r",
+              "    pm.expect(bug.status)\r",
+              "        .to.eql(\"OPEN\");\r",
+              "\r",
+              "});\r",
+              "const response = pm.response.json();\r",
+              "\r",
+              "pm.collectionVariables.set(\r",
+              "    \"bugId\",\r",
+              "    response.id\r",
+              ");"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"API login failure\",\r\n    \"priority\": \"HIGH\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/bugs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "bugs"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Bug",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", () => {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Bug title updated\", () => {\r",
+              "\r",
+              "    const bug = pm.response.json();\r",
+              "\r",
+              "    pm.expect(bug.title)\r",
+              "        .to.eql(\"Login bug fixed\");\r",
+              "\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Bug priority updated\", () => {\r",
+              "\r",
+              "    const bug = pm.response.json();\r",
+              "\r",
+              "    pm.expect(bug.priority)\r",
+              "        .to.eql(\"LOW\");\r",
+              "\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"Login bug fixed\",\r\n    \"priority\": \"LOW\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/bugs/{{bugId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "bugs",
+            "{{bugId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete bug",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", () => {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Deleted bug returned\", () => {\r",
+              "\r",
+              "    const bug = pm.response.json();\r",
+              "\r",
+              "    pm.expect(bug)\r",
+              "        .to.have.property(\"id\");\r",
+              "\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/bugs/{{bugId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "bugs",
+            "{{bugId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create bug - invalid data",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", () => {\r",
+              "    pm.response.to.have.status(400);\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Error message is returned\", () => {\r",
+              "\r",
+              "    const response = pm.response.json();\r",
+              "\r",
+              "    pm.expect(response.message)\r",
+              "        .to.eql(\"Title is required\");\r",
+              "\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"\",\r\n    \"priority\": \"HIGH\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/bugs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "bugs"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update non existing bug",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404\", () => {\r",
+              "    pm.response.to.have.status(404);\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Error message is returned\", () => {\r",
+              "\r",
+              "    const response = pm.response.json();\r",
+              "\r",
+              "    pm.expect(response.message)\r",
+              "        .to.eql(\"Bug not found\");\r",
+              "\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"This bug doesn't exist\",\r\n    \"priority\": \"LOW\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/bugs/999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "bugs",
+            "999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete non existing bug",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404\", () => {\r",
+              "    pm.response.to.have.status(404);\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Error message is returned\", () => {\r",
+              "\r",
+              "    const response = pm.response.json();\r",
+              "\r",
+              "    pm.expect(response.message)\r",
+              "        .to.eql(\"Bug not found\");\r",
+              "\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/bugs/999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "bugs",
+            "999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update bug status",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"CLOSED\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/bugs/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "bugs",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": ""
+    },
+    {
+      "key": "bugId",
+      "value": ""
+    },
+    {
+      "key": "existingBugId",
+      "value": ""
+    }
+  ]
+}
