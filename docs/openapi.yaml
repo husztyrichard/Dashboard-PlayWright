@@ -5,8 +5,11 @@ info:
   description: >-
     REST API for managing dashboard bugs used by the Playwright and Jest test suites.
 servers:
+  - url: https://dashboard-playwright.onrender.com
+    description: Production
+
   - url: http://localhost:3000
-    description: Local development server
+    description: Local
 paths:
   /api/bugs:
     get:
