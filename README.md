@@ -1,6 +1,6 @@
 # Dashboard Playwright
 
-![Playwright Tests](https://github.com/decoNTANK/Dashboard/actions/workflows/playwright.yml/badge.svg)
+![Playwright Tests](https://github.com/husztyrichard/Dashboard-PlayWright/actions/workflows/playwright.yml/badge.svg)
 
 ## QA Dashboard
 
